@@ -13,15 +13,15 @@ spec:
       labels:
         app: gitlab
     spec:
-      nodeSelector:
-        gitlab: "true"
+    #  nodeSelector:
+     #   gitlab: "true"
       containers:
         - name: gitlab
           image: gitlab/gitlab-ce:latest
           env:
             - name: GITLAB_OMNIBUS_CONFIG
               value: |
-                external_url 'http://192.168.1.100:30080'  # Замените на IP вашей ноды
+                external_url 'http://192.168.88.18:30080'  # Замените на IP вашей ноды
                 postgresql['enable'] = false
                 redis['enable'] = false
                 gitlab_rails['db_adapter'] = "postgresql"
@@ -40,18 +40,6 @@ spec:
         - name: gitlab-storage
           persistentVolumeClaim:
             claimName: gitlab-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: gitlab-pvc
-  namespace: gitlab
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
 ---
 apiVersion: v1
 kind: Service

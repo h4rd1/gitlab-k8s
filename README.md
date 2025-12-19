@@ -12,3 +12,6 @@ kubectl run -it runner-registrator \
 
 
 kubectl create namespace gitlab
+
+
+ storageClassName: local-storage # или оставьте пустым local-path
