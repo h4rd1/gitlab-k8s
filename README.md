@@ -8,3 +8,7 @@ kubectl run -it runner-registrator \
   --restart=Never \
   -- register
 
+
+
+
+kubectl create namespace gitlab
