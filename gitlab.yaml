@@ -19,7 +19,7 @@ spec:
           env:
             - name: GITLAB_OMNIBUS_CONFIG
               value: |
-                external_url 'http://192.168.88.18:30080'  # Замените на IP вашей ноды
+                external_url 'http://192.168.88.18:80'  # Замените на IP вашей ноды
                 postgresql['enable'] = false
                 redis['enable'] = false
                 gitlab_rails['db_adapter'] = "postgresql"
