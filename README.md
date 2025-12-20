@@ -1,6 +1,9 @@
 kubectl exec -it -n gitlab <pod-name> -- grep 'Password:' /etc/gitlab/initial_root_password
 #PASSWORD
 
+gitlab-rake "gitlab:password:reset[root]"
+
+
 gitlab runner 
 
 kubectl run -it runner-registrator \
