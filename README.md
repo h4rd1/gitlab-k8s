@@ -1,6 +1,8 @@
 kubectl exec -it -n gitlab <pod-name> -- grep 'Password:' /etc/gitlab/initial_root_password
 #PASSWORD
 
+kubectl create namespace gitlab
+
 gitlab-rake "gitlab:password:reset[root]"
 
 
