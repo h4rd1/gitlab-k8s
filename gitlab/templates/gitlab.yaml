@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+        - name: gitlab
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 443
+              name: https
+            - containerPort: 22
+              name: ssh
+          resources:
+            requests:
+              memory: "{{ .Values.resources.requests.memory }}"
+              cpu: "{{ .Values.resources.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.resources.limits.memory }}"
+              cpu: "{{ .Values.resources.limits.cpu }}"
+          env:
+            - name: EXTERNAL_URL
+              value: "{{ .Values.gitlab.externalUrl }}"
+            - name: DB_ADAPTER
+              value: "{{ .Values.gitlab.database.adapter }}"
+            - name: DB_HOST
+              value: "{{ .Values.gitlab.database.host }}"
+            - name: DB_PORT
+              value: "{{ .Values.gitlab.database.port | toString }}"
+            - name: DB_USER
+              value: "{{ .Values.gitlab.database.username }}"
+            - name: DB_PASS
+              value: "{{ .Values.gitlab.database.password }}"
+          volumeMounts:
+            - name: gitlab-data
+              mountPath: /var/opt/gitlab
+      volumes:
+        - name: gitlab-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}

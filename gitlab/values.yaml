@@ -1,0 +1,155 @@
+# Общие настройки
+name: gitlab
+namespace: gitlab
+replicaCount: 1
+
+# Настройки образа GitLab
+image:
+  repository: gitlab/gitlab-ce
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Ресурсные ограничения GitLab
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 500m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+
+# Настройки GitLab
+gitlab:
+  externalUrl: http://192.168.49.2:80  # Замените на IP вашей ноды
+  postgresql:
+    enabled: true  # ВКЛЮЧАЕМ встроенный PostgreSQL
+    host: postgres  # указываем хост сервиса PostgreSQL
+    port: 5432
+  redis:
+    enabled: true  # ВКЛЮЧАЕМ Redis
+    host: redis
+    port: 6379
+  database:
+    adapter: postgresql
+    host: postgres
+    port: 5432
+    username: gitlab
+    password: password
+
+# Персистентность для GitLab
+persistence:
+  enabled: true
+  name: gitlab-pvc
+  namespace: gitlab
+  accessMode: ReadWriteOnce
+  size: 20Gi
+  storageClassName: ""
+  selector:
+    matchLabels: {}
+  existingClaim: gitlab-pvc
+
+# Настройки сервиса GitLab
+service:
+  name: gitlab
+  type: NodePort
+  namespace: gitlab
+  sessionAffinity: None
+  ports:
+    http:
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+    ssh:
+      port: 22
+      targetPort: 22
+      nodePort: 30022
+    https:
+      port: 443
+      targetPort: 443
+      nodePort: 30443
+
+# Настройки Ingress
+ingress:
+  enabled: true
+  name: gitlab-ingress
+  namespace: gitlab
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls:
+    - hosts:
+        - gitlab.k3s.internal
+      secretName: gitlab-tls-secret
+  hosts:
+    - host: gitlab.k3s.internal
+      paths:
+        - path: /
+          pathType: Prefix
+          port: 80
+
+# Настройки PostgreSQL
+postgres:
+  enabled: true  # ОБЯЗАТЕЛЬНО: включаем PostgreSQL
+  name: postgres
+  namespace: gitlab
+  replicas: 1
+  labels:
+    app: postgres
+  image:
+    repository: postgres
+    tag: 16
+    pullPolicy: IfNotPresent
+  env:
+    password: "password"
+    database: "gitlabhq_production"
+    additional: {}
+  ports:
+    containerPort: 5432
+  persistence:
+    create: true
+    name: postgres-pvc
+    namespace: gitlab
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    storageClassName: ""
+    existingClaim: ""
+  service:
+    name: postgres
+    namespace: gitlab
+    type: ClusterIP
+    loadBalancerIP: ""
+    externalIPs: []
+    ports:
+      port: 5432
+      targetPort: 5432
+
+# Настройки Redis
+redis:
+  enabled: true  # ОБЯЗАТЕЛЬНО: включаем Redis
+  name: redis
+  namespace: gitlab
+  replicas: 1
+  labels:
+    app: redis
+  image:
+    repository: redis
+    tag: 6
+    pullPolicy: IfNotPresent
+  ports:
+    containerPort: 6379
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+  env: {}
+  service:
+    name: redis
+    namespace: gitlab
+    type: ClusterIP
+    loadBalancerIP: ""
+    externalIPs: []
+    ports:
+      port: 6379
+      targetPort: 6379

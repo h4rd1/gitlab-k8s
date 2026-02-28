@@ -1,0 +1,20 @@
+{{- if .Values.postgres.persistence.create -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.postgres.persistence.name | default "postgres-pvc" }}
+  namespace: {{ .Values.namespace | default .Values.postgres.persistence.namespace | default "gitlab" }}
+  labels:
+    app: {{ .Values.postgres.labels.app | default "postgres" }}
+    chart: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+spec:
+  accessModes:
+    - {{ .Values.postgres.persistence.accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .Values.postgres.persistence.size | default "10Gi" }}
+  {{- if .Values.postgres.persistence.storageClassName }}
+  storageClassName: {{ .Values.postgres.persistence.storageClassName }}
+  {{- end }}
+{{- end }}

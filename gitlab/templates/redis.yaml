@@ -1,0 +1,30 @@
+{{- if .Values.redis.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redis.name }}
+  namespace: {{ .Values.redis.namespace }}
+spec:
+  replicas: {{ .Values.redis.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redis.labels.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redis.labels.app }}
+    spec:
+      containers:
+        - name: redis
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.redis.ports.containerPort }}
+          resources:
+            requests:
+              memory: "{{ .Values.redis.resources.requests.memory }}"
+              cpu: "{{ .Values.redis.resources.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.redis.resources.limits.memory }}"
+              cpu: "{{ .Values.redis.resources.limits.cpu }}"
+{{- end }}
