@@ -12,8 +12,8 @@ image:
 # Ресурсные ограничения GitLab
 resources:
   requests:
-    memory: 512Mi
-    cpu: 500m
+    memory: 2Gi
+    cpu: 1000m
   limits:
     memory: 2Gi
     cpu: 1000m
@@ -77,10 +77,10 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
   tls:
     - hosts:
-        - gitlab.k3s.internal
+        - gitlab.minikube.internal
       secretName: gitlab-tls-secret
   hosts:
-    - host: gitlab.k3s.internal
+    - host: gitlab.minikube.internal
       paths:
         - path: /
           pathType: Prefix
